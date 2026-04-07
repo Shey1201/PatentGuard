@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # =================== 后端服务 ===================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: patentguard-backend
+    restart: unless-stopped
+    environment:
+      # Supabase 配置
+      - DATABASE_URL=postgresql+asyncpg://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+      - SUPABASE_URL=https://[PROJECT-REF].supabase.co
+      - SUPABASE_ANON_KEY=[YOUR-ANON-KEY]
+      - SUPABASE_SERVICE_KEY=[YOUR-SERVICE-KEY]
+      # 保留 JWT 配置（用于本地 token 验证）
+      - SECRET_KEY=patentguard-secret-key-change-in-production
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=1440
+      # Redis（可选，如果需要可使用 Upstash 等云服务）
+      - REDIS_URL=redis://localhost:6379/0
+    volumes:
+      - ./backend:/app/backend
+      - uploads:/app/uploads
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # =================== 前端服务（开发模式） ===================
+  frontend:
+    image: node:20-alpine
+    container_name: patentguard-frontend
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+      # Supabase 前端配置
+      - VITE_SUPABASE_URL=https://[PROJECT-REF].supabase.co
+      - VITE_SUPABASE_ANON_KEY=[YOUR-ANON-KEY]
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm install && npm run dev -- --host"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+# =================== 卷定义 ===================
+volumes:
+  uploads:
+
+# =================== 网络定义 ===================
+networks:
+  default:
+    name: patentguard-network

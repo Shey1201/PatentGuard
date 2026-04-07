@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: #1890ff;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* 浅色侧边栏：与主界面统一，深色强调选中态 */
+.pg-sider-light .ant-menu-light.ant-menu-inline .ant-menu-item {
+  margin-inline: 8px;
+  width: calc(100% - 16px);
+  border-radius: 8px;
+  height: 40px;
+  line-height: 40px;
+  color: #525252;
+}
+.pg-sider-light .ant-menu-light .ant-menu-item-icon {
+  font-size: 15px;
+  color: #737373;
+}
+.pg-sider-light .ant-menu-light.ant-menu-inline .ant-menu-item-selected {
+  background: rgba(23, 23, 23, 0.06) !important;
+  color: #171717 !important;
+  border-left: 3px solid #171717;
+  padding-left: 13px !important;
+  margin-left: 8px;
+}
+.pg-sider-light .ant-menu-light .ant-menu-item-selected .ant-menu-item-icon {
+  color: #404040;
+}
+.pg-sider-light .ant-menu-light .ant-menu-item:hover {
+  background: rgba(23, 23, 23, 0.04) !important;
+  color: #171717 !important;
+}
+.pg-sider-light .ant-menu-light .ant-menu-item-danger {
+  color: #dc2626 !important;
+}
+.pg-sider-light .ant-menu-light .ant-menu-item-danger.ant-menu-item-selected {
+  background: rgba(220, 38, 38, 0.08) !important;
+  border-left-color: #dc2626;
+}
+.pg-sider-light .ant-menu-light .ant-menu-divider {
+  border-color: #e5e5e5;
+  margin: 8px 12px;
+}
+
+/* 主内容区：侧栏固定时留出左边距，小屏侧栏收起时不留白 */
+.pg-main-layout {
+  margin-left: 196px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 991px) {
+  .pg-main-layout {
+    margin-left: 0;
+  }
+}

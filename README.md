@@ -156,23 +156,6 @@ PatentGuard/
 
 启动后端后访问 **http://localhost:8000/docs**（Swagger UI）
 
-### 核心 API 端点
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| `POST` | `/api/v1/auth/register` | 用户注册 |
-| `POST` | `/api/v1/auth/login` | 用户登录 |
-| `GET` | `/api/v1/kb/categories` | 获取文档分类 |
-| `POST` | `/api/v1/kb/documents/upload` | 上传知识库文档 |
-| `POST` | `/api/v1/kb/documents/{id}/process` | 处理文档（分块+向量化）|
-| `GET` | `/api/v1/kb/search?q=` | 检索知识库 |
-| `POST` | `/api/v1/analysis/review/with-file` | **上传文件并审查（RAG 核心）** |
-| `GET` | `/api/v1/analysis/tasks/{id}` | 获取审查任务状态 |
-| `GET` | `/api/v1/analysis/results/{id}` | 获取审查结果 |
-| `GET` | `/api/v1/analysis/history` | 获取审查历史 |
-| `PUT` | `/api/v1/system/config/llm` | 更新 LLM 配置 |
-| `GET` | `/api/v1/system/stats` | 系统统计（管理员）|
-
 ### 审查类型
 
 `review_type` 参数支持四种审查模式：
@@ -183,42 +166,6 @@ PatentGuard/
 | `patent` | 专利审查 | 专利申请书、权利要求书 |
 | `law` | 法律审查 | 法律法规合规性 |
 | `contract` | 合同审查 | 合同协议条款风险 |
-
----
-
-## 数据库 Schema
-
-### 主要表结构
-
-**`documents`** - 知识库文档表
-**`document_chunks`** - 文档分块向量表（HNSW 索引）
-**`review_tasks`** - 审查任务表（含 `review_type` 字段）
-**`categories`** - 文档分类表
-**`users`** - 用户表
-**`system_config`** - 系统配置表
-**`user_api_configs`** - 用户 API 个性化配置表
-
----
-
-## 审查结果说明
-
-审查完成后，每个 `finding` 包含以下字段：
-
-| 字段 | 说明 |
-|------|------|
-| `type` | 类型：`risk`（风险）/ `suggestion`（建议）|
-| `severity` | 严重程度：`low` / `medium` / `high` |
-| `description` | 问题描述 |
-| `reference` | 法规依据（来自知识库）|
-| `suggestion` | 修改建议 |
-| `verification_status` | 引用校验状态：`verified`（已验证）/ `unverified`（未验证，⚠️ 标记）|
-
----
-
-## 界面说明
-
-- **普通用户**：工作台 + 文档审查（前台使用）。
-- **管理员**：后台管理（管理概览、知识库管理、系统设置等）；顶部可切换「普通用户 / 管理员」视图。
 
 ---
 

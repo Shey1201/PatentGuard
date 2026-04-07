@@ -13,6 +13,7 @@ import {
   ArrowUpOutlined,
   UserOutlined,
   CrownOutlined,
+  BarChartOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from "dayjs";
@@ -22,6 +23,7 @@ import { systemApi, analysisApi } from "../services/api";
 import { SystemStats, UserStats, ReviewTask } from "../types";
 import { ActivityFeed, ActivityItem } from "../components/ActivityFeed";
 import { useAuthStore } from "../stores/auth";
+import AdminStatsCharts from "../components/AdminStatsCharts";
 
 dayjs.extend(relativeTime);
 dayjs.locale("zh-cn");
@@ -353,6 +355,15 @@ const AdminDashboard: React.FC<{
                 <div className="text-xs text-gray-400 mt-0.5">合规通过率</div>
               </div>
             </div>
+          </div>
+        </Col>
+      </Row>
+
+      {/* 数据可视化看板 */}
+      <Row gutter={[12, 12]} className="mb-5">
+        <Col xs={24}>
+          <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
+            <AdminStatsCharts />
           </div>
         </Col>
       </Row>

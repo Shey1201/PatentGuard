@@ -140,4 +140,88 @@ export const systemApi = {
     ),
 };
 
+// Tracking API
+export const trackingApi = {
+  trackEvent: (data: {
+    event_name: string;
+    event_category?: string;
+    session_id?: string;
+    resource_id?: string;
+    properties?: Record<string, any>;
+    system_info?: Record<string, any>;
+  }) => api.post('/track/events', data),
+
+  trackEventsBatch: (data: { events: any[] }) =>
+    api.post('/track/events/batch', data),
+
+  getEvents: (params?: {
+    event_name?: string;
+    event_category?: string;
+    session_id?: string;
+    start_date?: string;
+    end_date?: string;
+    page?: number;
+    page_size?: number;
+  }) => api.get('/track/events', { params }),
+
+  getStats: (params?: {
+    start_date?: string;
+    end_date?: string;
+    event_name?: string;
+    event_category?: string;
+  }) => api.get('/track/stats', { params }),
+
+  // 新增：获取用于可视化看板的统计数据
+  getDashboardStats: (params?: {
+    start_date?: string;
+    end_date?: string;
+  }) => api.get('/track/dashboard-stats', { params }),
+
+  // 新增：获取每日趋势数据
+  getDailyTrend: (params?: {
+    start_date?: string;
+    end_date?: string;
+    event_name?: string;
+  }) => api.get('/track/daily-trend', { params }),
+
+  // 新增：获取漏斗分析数据
+  getFunnelData: (params?: {
+    start_date?: string;
+    end_date?: string;
+  }) => api.get('/track/funnel', { params }),
+
+  // 新增：获取审查类型分布
+  getReviewTypeDistribution: (params?: {
+    start_date?: string;
+    end_date?: string;
+  }) => api.get('/track/review-type-distribution', { params }),
+
+  // 新增：获取风险等级分布
+  getRiskDistribution: (params?: {
+    start_date?: string;
+    end_date?: string;
+  }) => api.get('/track/risk-distribution', { params }),
+
+  getAPILogs: (params?: {
+    endpoint?: string;
+    status_code?: number;
+    start_date?: string;
+    end_date?: string;
+    page?: number;
+    page_size?: number;
+  }) => api.get('/track/api-logs', { params }),
+
+  // 新增：获取 API 性能统计
+  getAPIPerformance: (params?: {
+    start_date?: string;
+    end_date?: string;
+  }) => api.get('/track/api-performance', { params }),
+
+  exportEvents: (params: {
+    start_date: string;
+    end_date: string;
+    event_category?: string;
+  }) => api.get('/track/events/export', { params }),
+};
+
 export default api;

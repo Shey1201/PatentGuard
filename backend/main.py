@@ -1,11 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+import time
 import loguru
 
 from backend.config_local import get_settings
-from backend.models.database import init_db
+from backend.models.database import init_db, get_db, AsyncSessionLocal
 from backend.api import auth, kb, analysis, system, user_config
+from backend.api.tracking import router as tracking_router
+from backend.services.tracking import TrackingService
 
 settings = get_settings()
 
@@ -50,6 +53,62 @@ app.include_router(kb.router, prefix="/api/v1")
 app.include_router(analysis.router, prefix="/api/v1")
 app.include_router(system.router, prefix="/api/v1")
 app.include_router(user_config.router, prefix="/api/v1")
+app.include_router(tracking_router, prefix="/api/v1")
+
+
+@app.middleware("http")
+async def api_logging_middleware(request: Request, call_next):
+    """API 日志记录中间件"""
+    if request.url.path.startswith("/api/"):
+        start_time = time.time()
+
+        request_size = 0
+        if request.method in ["POST", "PUT", "PATCH"]:
+            try:
+                body = await request.body()
+                request_size = len(body)
+            except Exception:
+                pass
+
+        response = await call_next(request)
+
+        duration_ms = int((time.time() - start_time) * 1000)
+        status_code = response.status_code
+
+        try:
+            async with AsyncSessionLocal() as session:
+                user_id = None
+                try:
+                    from backend.api.auth import get_user_from_token
+                    auth_header = request.headers.get("Authorization")
+                    if auth_header and auth_header.startswith("Bearer "):
+                        token = auth_header[7:]
+                        user = await get_user_from_token(token)
+                        if user:
+                            user_id = user.id
+                except Exception:
+                    pass
+
+                ip_address = request.client.host if request.client else None
+                user_agent = request.headers.get("user-agent")
+
+                await TrackingService.log_api_call(
+                    session=session,
+                    method=request.method,
+                    endpoint=request.url.path,
+                    status_code=status_code,
+                    duration_ms=duration_ms,
+                    user_id=user_id,
+                    ip_address=ip_address,
+                    user_agent=user_agent,
+                    request_size=request_size,
+                )
+        except Exception as e:
+            loguru.logger.warning(f"API 日志记录失败: {e}")
+
+        return response
+    else:
+        return await call_next(request)
 
 
 @app.get("/")

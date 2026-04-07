@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Card, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '../services/api';
 import { useAuthStore } from '../stores/auth';
+import { tracker } from '../utils/tracker';
 
 interface LoginForm {
   email: string;
@@ -25,9 +26,16 @@ const LoginPage: React.FC = () => {
     try {
       const { data } = await authApi.login(values);
       setAuth(data.user, data.access_token);
+
+      // 记录登录成功埋点
+      tracker.trackLogin('password', true);
+      tracker.setUserId(data.user.id);
+
       message.success('登录成功');
       navigate('/');
     } catch (error: any) {
+      // 记录登录失败埋点
+      tracker.trackLogin('password', false);
       message.error(error.response?.data?.detail || '登录失败');
     } finally {
       setLoading(false);
@@ -39,6 +47,15 @@ const LoginPage: React.FC = () => {
     try {
       const { data } = await authApi.register(values);
       setAuth(data.user, data.access_token);
+
+      // 记录注册成功埋点
+      tracker.track({
+        event_name: 'register',
+        event_category: 'user_action',
+        properties: { method: 'email' },
+      });
+      tracker.setUserId(data.user.id);
+
       message.success('注册成功');
       navigate('/');
     } catch (error: any) {

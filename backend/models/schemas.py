@@ -292,3 +292,137 @@ class UserAPIConfigWithMask(UserAPIConfigBase):
 
 class TestUserLLMRequest(BaseModel):
     prompt: str
+
+
+# ===== 数据埋点相关 Schema =====
+
+class TrackEventBase(BaseModel):
+    """埋点事件基础模型"""
+    event_name: str
+    event_category: Optional[str] = None
+    properties: Optional[Dict[str, Any]] = None
+
+
+class TrackEventCreate(TrackEventBase):
+    """创建埋点事件"""
+    session_id: Optional[str] = None
+    resource_id: Optional[str] = None
+    system_info: Optional[Dict[str, Any]] = None
+
+
+class TrackEventBatchCreate(BaseModel):
+    """批量创建埋点事件"""
+    events: List[TrackEventCreate]
+
+
+class TrackEventResponse(BaseModel):
+    """埋点事件响应"""
+    id: UUID
+    event_name: str
+    event_category: Optional[str]
+    user_id: Optional[UUID]
+    session_id: Optional[str]
+    resource_id: Optional[UUID]
+    properties: Optional[Dict[str, Any]]
+    system_info: Optional[Dict[str, Any]]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class APILogResponse(BaseModel):
+    """API 日志响应"""
+    id: UUID
+    user_id: Optional[UUID]
+    method: Optional[str]
+    endpoint: Optional[str]
+    status_code: Optional[int]
+    duration_ms: Optional[int]
+    request_size: Optional[int]
+    response_size: Optional[int]
+    ip_address: Optional[str]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class TrackStatsRequest(BaseModel):
+    """埋点统计请求"""
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    event_name: Optional[str] = None
+    event_category: Optional[str] = None
+    group_by: Optional[str] = None
+
+
+class TrackStatsResponse(BaseModel):
+    """埋点统计响应"""
+    total_count: int
+    event_counts: Dict[str, int]
+    daily_counts: List[Dict[str, Any]]
+    user_counts: int
+    page_view_counts: Dict[str, int]
+    action_counts: Dict[str, int]
+
+
+# ===== 新增：可视化看板相关 Schema =====
+
+class DashboardStatsResponse(BaseModel):
+    """管理员看板统计数据响应"""
+    total_events: int
+    active_users: int
+    event_counts: Dict[str, int]
+
+
+class DailyTrendItem(BaseModel):
+    """每日趋势数据项"""
+    date: str
+    dau: int = 0
+    page_views: int = 0
+    reviews: int = 0
+    uploads: int = 0
+    searches: int = 0
+
+
+class DailyTrendResponse(BaseModel):
+    """每日趋势响应"""
+    trend: List[DailyTrendItem]
+
+
+class FunnelItem(BaseModel):
+    """漏斗数据项"""
+    step: str
+    count: int
+    rate: float
+
+
+class FunnelResponse(BaseModel):
+    """漏斗数据响应"""
+    funnel: List[FunnelItem]
+
+
+class DistributionItem(BaseModel):
+    """分布数据项"""
+    name: str
+    value: int
+
+
+class DistributionResponse(BaseModel):
+    """分布数据响应"""
+    distribution: List[DistributionItem]
+
+
+class APIPerfItem(BaseModel):
+    """API 性能数据项"""
+    endpoint: str
+    call_count: int
+    avg_ms: float
+    p50_ms: float
+    p95_ms: float
+
+
+class APIPerformanceResponse(BaseModel):
+    """API 性能响应"""
+    performance: List[APIPerfItem]

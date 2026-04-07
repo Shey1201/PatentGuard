@@ -139,6 +139,48 @@ async def get_current_user(
     return user
 
 
+async def get_optional_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(
+        HTTPBearer(auto_error=False)
+    ),
+    db: AsyncSession = Depends(lambda: None)
+) -> Optional[User]:
+    """获取当前用户（可选）- 未登录时返回 None"""
+    if credentials is None:
+        return None
+
+    try:
+        return await get_current_user(credentials, db)
+    except HTTPException:
+        return None
+
+
+async def get_user_from_token(token: str) -> Optional[User]:
+    """根据 token 获取用户（用于中间件）"""
+    from backend.models.database import AsyncSessionLocal
+
+    if token == DEMO_TOKEN:
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(select(User).where(User.email == "admin@patentguard.com"))
+            return result.scalar_one_or_none()
+
+    try:
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.jwt_algorithm])
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(select(User).where(User.id == UUID(user_id)))
+            user = result.scalar_one_or_none()
+            if user and user.is_active:
+                return user
+    except Exception:
+        pass
+
+    return None
+
+
 async def authenticate_user(email: str, password: str, db: AsyncSession) -> Optional[User]:
     """使用 Supabase Auth 认证用户"""
     try:

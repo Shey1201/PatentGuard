@@ -121,6 +121,41 @@ class AuditLog(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
+# API 调用日志表
+class APILog(Base):
+    """API 调用日志，用于性能监控和调用量统计"""
+    __tablename__ = "api_logs"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True))
+    method = Column(String(10))
+    endpoint = Column(String(255))
+    status_code = Column(Integer)
+    duration_ms = Column(Integer)
+    request_size = Column(BigInteger)
+    response_size = Column(BigInteger)
+    ip_address = Column(String(45))
+    user_agent = Column(Text)
+    error_message = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+# 业务事件表
+class BusinessEvent(Base):
+    """业务事件日志，用于用户行为分析"""
+    __tablename__ = "business_events"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    event_name = Column(String(100), nullable=False)
+    event_category = Column(String(50))
+    user_id = Column(UUID(as_uuid=True))
+    session_id = Column(String(100))
+    resource_id = Column(UUID(as_uuid=True))
+    properties = Column(JSON)
+    system_info = Column(JSON)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 # User API Configs (每个用户独立的 API 配置)
 class UserAPIConfig(Base):
     __tablename__ = "user_api_configs"

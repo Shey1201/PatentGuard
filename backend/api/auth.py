@@ -13,7 +13,8 @@ from backend.models.schemas import (
 )
 from backend.services.auth import (
     get_password_hash, verify_password, create_access_token,
-    get_current_user, decode_token, sign_up, sign_in, authenticate_user
+    get_current_user, get_optional_user, get_user_from_token,
+    decode_token, sign_up, sign_in, authenticate_user
 )
 from backend.config_local import get_settings
 

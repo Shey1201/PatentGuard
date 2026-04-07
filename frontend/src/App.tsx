@@ -15,6 +15,8 @@ import {
 } from '@ant-design/icons';
 import { useAuthStore } from './stores/auth';
 import { useAppModeStore } from './stores/appMode';
+import { useTrackerStore } from './stores/tracker';
+import { tracker } from './utils/tracker';
 import LoginPage from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import KnowledgeBasePage from './pages/KnowledgeBase';
@@ -66,6 +68,9 @@ const AppLayoutShell: React.FC = () => {
 
   const onUserMenuClick: MenuProps['onClick'] = ({ key }) => {
     if (key === 'logout') {
+      // 记录退出登录埋点
+      tracker.trackLogout();
+      tracker.setUserId(null);
       logout();
     }
   };
@@ -242,6 +247,36 @@ const AppLayoutShell: React.FC = () => {
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const viewMode = useAppModeStore((s) => s.viewMode);
+  const user = useAuthStore((s) => s.user);
+  const { initTracker, setUserId, trackPageView } = useTrackerStore();
+  const location = useLocation();
+
+  // 初始化埋点
+  useEffect(() => {
+    initTracker();
+  }, [initTracker]);
+
+  // 用户登录后设置用户ID
+  useEffect(() => {
+    if (user?.id) {
+      setUserId(user.id);
+    }
+  }, [user?.id, setUserId]);
+
+  // 页面变化时发送页面浏览埋点
+  useEffect(() => {
+    const pageTitles: Record<string, string> = {
+      '/': '工作台',
+      '/admin': '工作台',
+      '/admin/knowledge': '知识库管理',
+      '/admin/settings': '系统设置',
+      '/review': '文档审查',
+      '/history': '历史记录',
+      '/login': '登录',
+    };
+    const title = pageTitles[location.pathname] || '未知页面';
+    trackPageView(location.pathname, title);
+  }, [location.pathname, trackPageView]);
 
   // 未登录：强制跳转登录
   if (!isAuthenticated) {

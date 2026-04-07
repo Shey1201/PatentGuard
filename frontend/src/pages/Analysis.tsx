@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   Upload, Button, Result, Tag, List, Progress, Space, Alert,
   Card, Collapse, Typography, Empty, Select, Divider,
@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons';
 import { analysisApi } from '../services/api';
 import { ReviewTask, ReviewResult } from '../types';
+import { tracker } from '../utils/tracker';
 
 const { Panel } = Collapse;
 
@@ -30,9 +31,13 @@ const AnalysisPage: React.FC = () => {
   const [task, setTask] = useState<ReviewTask | null>(null);
   const [result, setResult] = useState<ReviewResult | null>(null);
   const uploadInputRef = useRef<HTMLInputElement>(null);
+  const startTimeRef = useRef<number>(0);
 
   const pollResult = async (taskId: string) => {
     let completed = false;
+    const startTime = startTimeRef.current;
+    let documentName = fileList[0]?.name || '未知文档';
+
     while (!completed) {
       try {
         const { data } = await analysisApi.getTask(taskId);
@@ -40,9 +45,31 @@ const AnalysisPage: React.FC = () => {
         if (data.status === 'completed') {
           const res = await analysisApi.getResult(taskId);
           setResult(res.data ?? null);
+
+          // 记录审查完成埋点
+          const duration = Date.now() - startTime;
+          tracker.trackReviewComplete({
+            document_id: taskId,
+            document_name: documentName,
+            review_type: data.review_type || reviewType,
+            success: true,
+            duration_ms: duration,
+          });
+
           completed = true;
         } else if (data.status === 'failed') {
           setResult(null);
+
+          // 记录审查失败埋点
+          const duration = Date.now() - startTime;
+          tracker.trackReviewComplete({
+            document_id: taskId,
+            document_name: documentName,
+            review_type: data.review_type || reviewType,
+            success: false,
+            duration_ms: duration,
+          });
+
           completed = true;
         } else {
           await new Promise(r => setTimeout(r, 2000));
@@ -61,6 +88,15 @@ const AnalysisPage: React.FC = () => {
     setLoading(true);
     setTask(null);
     setResult(null);
+    startTimeRef.current = Date.now();
+
+    // 记录文档上传埋点
+    tracker.trackDocumentUpload({
+      document_name: file.name,
+      review_type: reviewType,
+      file_size: file.size,
+      file_type: file.name.split('.').pop()?.toLowerCase() || 'unknown',
+    });
 
     try {
       const formData = new FormData();
@@ -68,6 +104,14 @@ const AnalysisPage: React.FC = () => {
       formData.append('review_type', reviewType);
       const { data } = await analysisApi.reviewWithFile(formData);
       setTask(data);
+
+      // 记录审查提交埋点
+      tracker.trackReviewSubmit({
+        document_id: data.id,
+        document_name: file.name,
+        review_type: reviewType,
+      });
+
       pollResult(data.id);
     } catch (error) {
       console.error(error);
@@ -204,7 +248,17 @@ const AnalysisPage: React.FC = () => {
             )}
 
             {/* 底部操作 */}
-            <div className="mt-5">
+            <div className="mt-5" onClick={(e) => {
+              const target = e.target as HTMLElement;
+              const button = target.closest('button');
+              if (button) {
+                tracker.trackClick({
+                  element_id: button.id || undefined,
+                  element_text: button.textContent?.trim() || undefined,
+                  page_url: '/review',
+                });
+              }
+            }}>
               {fileList.length > 0 ? (
                 <Button
                   type="primary"

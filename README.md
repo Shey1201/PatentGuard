@@ -100,8 +100,6 @@ docker-compose up -d
 - 埋点实现：[docs/engineering/tracking-implementation.md](docs/engineering/tracking-implementation.md)
 - 埋点分析：[docs/engineering/tracking-analytics.md](docs/engineering/tracking-analytics.md)
 - 部署说明：[docs/ops/deployment.md](docs/ops/deployment.md)
-- 常见问题：[docs/ops/faq.md](docs/ops/faq.md)
-- 面试材料：[docs/presentation/interview-notes.md](docs/presentation/interview-notes.md)
 
 ## 许可证
 

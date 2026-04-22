@@ -1,6 +1,7 @@
 # PatentGuard
 
 > 基于 RAG 的专利与文档合规审查系统。
+
 PatentGuard 面向专利、合同、法规与通用文档审查场景，基于 FastAPI、React、PostgreSQL/pgvector 与可配置 LLM，实现知识库管理、检索增强审查、引用溯源、用户级模型配置和行为埋点统计。
 
 ![PatentGuard 项目示意图](assets/project-overview.png)

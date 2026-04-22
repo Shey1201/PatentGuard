@@ -4,7 +4,6 @@ import {
   DatabaseOutlined,
   CheckCircleOutlined,
   RocketOutlined,
-  SafetyCertificateOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
   WarningOutlined,
@@ -13,7 +12,6 @@ import {
   ArrowUpOutlined,
   UserOutlined,
   CrownOutlined,
-  BarChartOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from "dayjs";
@@ -248,7 +246,6 @@ const AdminDashboard: React.FC<{
   stats: SystemStats | null;
   activityItems: ActivityItem[] | null;
 }> = ({ stats, activityItems }) => {
-  const navigate = useNavigate();
   const d = stats?.total_documents ?? 0;
   const p = stats?.processed_documents ?? 0;
   const c = stats?.total_chunks ?? 0;
@@ -522,7 +519,6 @@ const Dashboard: React.FC = () => {
     null,
   );
   const [loading, setLoading] = useState(true);
-  const [taskLoading, setTaskLoading] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const user = useAuthStore((s) => s.user);
@@ -545,7 +541,6 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const loadRecentTasks = useCallback(async () => {
-    setTaskLoading(true);
     try {
       const { data } = await analysisApi.getHistory({ page: 1, page_size: 5 });
       setRecentTasks(data?.items ?? []);
@@ -564,7 +559,6 @@ const Dashboard: React.FC = () => {
         console.warn("history load failed", e);
       }
     }
-    setTaskLoading(false);
   }, [isAdminPath, isAdminRole]);
 
   const loadStats = useCallback(async () => {
@@ -604,7 +598,7 @@ const Dashboard: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  const handleViewTask = (task: ReviewTask) => {
+  const handleViewTask = () => {
     navigate("/review");
   };
 

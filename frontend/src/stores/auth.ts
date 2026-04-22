@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { DEMO_PREVIEW_TOKEN } from '../constants/auth';
+import { DEMO_PREVIEW_TOKEN, ENABLE_DEMO_MODE } from '../constants/auth';
 import { User } from '../types';
 
 interface AuthState {
@@ -24,9 +24,9 @@ const defaultUser: User = {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      user: defaultUser,
-      token: DEMO_PREVIEW_TOKEN,
-      isAuthenticated: true, // 默认已登录，方便预览
+      user: ENABLE_DEMO_MODE ? defaultUser : null,
+      token: ENABLE_DEMO_MODE ? DEMO_PREVIEW_TOKEN : null,
+      isAuthenticated: ENABLE_DEMO_MODE,
       setAuth: (user, token) => {
         localStorage.setItem('token', token);
         set({ user, token, isAuthenticated: true });
@@ -34,9 +34,12 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        // 预览模式下登出后重新设置默认用户
-        set({ user: defaultUser, token: DEMO_PREVIEW_TOKEN, isAuthenticated: true });
-        localStorage.setItem('token', DEMO_PREVIEW_TOKEN);
+        if (ENABLE_DEMO_MODE) {
+          set({ user: defaultUser, token: DEMO_PREVIEW_TOKEN, isAuthenticated: true });
+          localStorage.setItem('token', DEMO_PREVIEW_TOKEN);
+        } else {
+          set({ user: null, token: null, isAuthenticated: false });
+        }
       },
     }),
     {

@@ -3,7 +3,7 @@ from typing import Optional
 from pathlib import Path
 import uuid
 import aiohttp
-from backend.config_local import get_settings
+from backend.config import get_settings
 
 settings = get_settings()
 

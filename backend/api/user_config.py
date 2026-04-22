@@ -44,13 +44,13 @@ async def get_user_api_config(
         return UserAPIConfigWithMask(
             id=uuid.UUID("00000000-0000-0000-0000-000000000000"),
             user_id=user.id,
-            llm_provider="openai",
+            llm_provider="custom",
             llm_api_key=None,
-            llm_base_url="https://api.openai.com/v1",
-            llm_model="gpt-4o-mini",
-            embedding_model="text-embedding-3-small",
+            llm_base_url="",
+            llm_model="",
+            embedding_model="",
             embedding_api_key=None,
-            embedding_base_url="https://api.openai.com/v1",
+            embedding_base_url="",
             embedding_dim=1536,
             is_active=False,
             created_at=None,
@@ -113,13 +113,13 @@ async def update_user_api_config(
         # 如果不存在，则创建
         config = UserAPIConfig(
             user_id=user.id,
-            llm_provider=config_update.llm_provider or "openai",
+            llm_provider=config_update.llm_provider or "custom",
             llm_api_key=config_update.llm_api_key,
-            llm_base_url=config_update.llm_base_url or "https://api.openai.com/v1",
-            llm_model=config_update.llm_model or "gpt-4o-mini",
-            embedding_model=config_update.embedding_model or "text-embedding-3-small",
+            llm_base_url=config_update.llm_base_url or "",
+            llm_model=config_update.llm_model or "",
+            embedding_model=config_update.embedding_model or "",
             embedding_api_key=config_update.embedding_api_key,
-            embedding_base_url=config_update.embedding_base_url or "https://api.openai.com/v1",
+            embedding_base_url=config_update.embedding_base_url or "",
             embedding_dim=config_update.embedding_dim or 1536,
             is_active=True
         )

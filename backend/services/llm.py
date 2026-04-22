@@ -2,7 +2,7 @@ import json
 import httpx
 import time
 from typing import Dict, Any, Optional
-from backend.config_local import get_settings
+from backend.config import get_settings
 
 settings = get_settings()
 

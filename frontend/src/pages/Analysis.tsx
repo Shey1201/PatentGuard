@@ -1,9 +1,10 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Upload, Button, Result, Tag, List, Progress, Space, Alert,
-  Card, Collapse, Typography, Empty, Select, Divider,
+  Card, Collapse, Empty, Select, Divider,
 } from 'antd';
 import type { UploadFile } from 'antd';
+import type { RcFile } from 'antd/es/upload';
 import {
   UploadOutlined, FileTextOutlined, CheckCircleOutlined, CloseCircleOutlined,
   ThunderboltOutlined, LinkOutlined, DownloadOutlined, ReloadOutlined,
@@ -22,8 +23,6 @@ const REVIEW_TYPES = [
   { label: '合同审查', value: 'contract', desc: '合同协议条款风险评估' },
 ];
 
-const SAMPLE_DOC_LINK = '#';
-
 const AnalysisPage: React.FC = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [reviewType, setReviewType] = useState('general');
@@ -36,7 +35,7 @@ const AnalysisPage: React.FC = () => {
   const pollResult = async (taskId: string) => {
     let completed = false;
     const startTime = startTimeRef.current;
-    let documentName = fileList[0]?.name || '未知文档';
+    const documentName = fileList[0]?.name || '未知文档';
 
     while (!completed) {
       try {
@@ -160,7 +159,7 @@ const AnalysisPage: React.FC = () => {
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
-                if (f) setFileList([{ uid: '-1', name: f.name, status: 'done', originFileObj: f }]);
+                if (f) setFileList([{ uid: '-1', name: f.name, status: 'done', originFileObj: f as RcFile }]);
                 e.target.value = '';
               }}
             />
@@ -375,9 +374,9 @@ const AnalysisPage: React.FC = () => {
               >
                 {result.findings && result.findings.length > 0 ? (
                   <List
-                    size="middle"
+                    size="default"
                     dataSource={result.findings}
-                    renderItem={(item, i) => (
+                    renderItem={(item) => (
                       <List.Item className="!border-gray-100">
                         <div className="w-full py-1">
                           <Space className="mb-2 flex-wrap">
@@ -414,7 +413,7 @@ const AnalysisPage: React.FC = () => {
                   className="!rounded-2xl !border-gray-100"
                 >
                   <List
-                    size="middle"
+                    size="default"
                     dataSource={result.referenced_documents}
                     renderItem={(item) => (
                       <List.Item className="!border-gray-100">

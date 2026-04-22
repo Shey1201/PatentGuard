@@ -133,9 +133,9 @@ async def test_llm_connection(
 
     llm_service = LLMService(
         api_key=configs.get("llm_api_key", ""),
-        base_url=configs.get("llm_base_url", "https://api.openai.com/v1"),
-        model=configs.get("llm_model", "gpt-4o-mini"),
-        provider=configs.get("llm_provider", "openai")
+        base_url=configs.get("llm_base_url", ""),
+        model=configs.get("llm_model", ""),
+        provider=configs.get("llm_provider", "custom")
     )
 
     result = await llm_service.test_connection(test_request.prompt)

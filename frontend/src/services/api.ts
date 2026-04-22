@@ -1,8 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import { DEMO_PREVIEW_TOKEN } from '../constants/auth';
-
-// 强制使用真实API，不再降级到模拟数据
-const USE_MOCK = false;
+import { DEMO_PREVIEW_TOKEN, ENABLE_DEMO_MODE } from '../constants/auth';
 
 // 使用相对路径，通过 Vite 代理转发到后端
 const API_BASE_URL = '/api/v1';
@@ -28,7 +25,7 @@ function getAuthToken(): string | null {
       if (fromPersist) return fromPersist;
     }
   } catch (_) {}
-  return DEMO_PREVIEW_TOKEN;
+  return ENABLE_DEMO_MODE ? DEMO_PREVIEW_TOKEN : null;
 }
 
 // 请求拦截器 - 添加 Token
@@ -55,11 +52,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-// API 调用（强制使用真实后端API，不再降级）
-const withFallback = async <T>(real: () => Promise<T>): Promise<T> => {
-  return real();
-};
 
 // Auth API
 export const authApi = {

@@ -164,15 +164,15 @@ class UserAPIConfig(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     # LLM 配置
-    llm_provider = Column(String(50), default="openai")
+    llm_provider = Column(String(50), default="custom")
     llm_api_key = Column(String(255))  # 用户自己的 API Key
-    llm_base_url = Column(String(255), default="https://api.openai.com/v1")
-    llm_model = Column(String(100), default="gpt-4o-mini")
+    llm_base_url = Column(String(255), default="")
+    llm_model = Column(String(100), default="")
 
     # Embedding 配置
-    embedding_model = Column(String(100), default="text-embedding-3-small")
+    embedding_model = Column(String(100), default="")
     embedding_api_key = Column(String(255))  # 用户自己的 API Key
-    embedding_base_url = Column(String(255), default="https://api.openai.com/v1")
+    embedding_base_url = Column(String(255), default="")
     embedding_dim = Column(Integer, default=1536)
 
     is_active = Column(Boolean, default=True)
@@ -181,7 +181,7 @@ class UserAPIConfig(Base):
 
 
 # Database setup - 使用配置文件中的数据库URL
-from backend.config_local import get_settings
+from backend.config import get_settings
 
 settings = get_settings()
 DATABASE_URL = settings.database_url
@@ -204,12 +204,13 @@ async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    # 创建默认用户
-    await create_default_users()
-    # 创建默认分类与模拟数据（无则插入）
-    await create_default_categories_and_documents()
-    # 确保有模拟审查任务数据
-    await ensure_default_review_tasks()
+    if settings.enable_demo_mode:
+        # 创建默认用户
+        await create_default_users()
+        # 创建默认分类与模拟数据（无则插入）
+        await create_default_categories_and_documents()
+        # 确保有模拟审查任务数据
+        await ensure_default_review_tasks()
 
 
 async def create_default_users():

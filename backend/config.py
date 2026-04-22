@@ -1,8 +1,5 @@
 from pydantic_settings import BaseSettings
 from functools import lru_cache
-from typing import Optional
-
-
 class Settings(BaseSettings):
     # Database (Supabase)
     database_url: str = "postgresql+asyncpg://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
@@ -11,6 +8,11 @@ class Settings(BaseSettings):
     supabase_url: str = "https://[YOUR-PROJECT-REF].supabase.co"
     supabase_anon_key: str = ""
     supabase_service_key: str = ""
+
+    # File storage
+    upload_dir: str = "./uploads"
+    use_supabase_storage: bool = True
+    storage_bucket: str = "documents"
 
     # MinIO (可选，如果使用 Supabase Storage 则可移除)
     minio_endpoint: str = "localhost:9000"
@@ -26,18 +28,19 @@ class Settings(BaseSettings):
     secret_key: str = "patentguard-secret-key-change-in-production"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 1440
+    enable_demo_mode: bool = True
 
     # LLM (Default - 可被数据库配置覆盖)
-    llm_provider: str = "openai"
+    llm_provider: str = "custom"
     llm_api_key: str = ""
-    llm_base_url: str = "https://api.openai.com/v1"
-    llm_model: str = "gpt-4o-mini"
+    llm_base_url: str = ""
+    llm_model: str = ""
 
     # Embedding
-    embedding_model: str = "text-embedding-3-small"
+    embedding_model: str = ""
     embedding_dim: int = 1536
     embedding_api_key: str = ""
-    embedding_base_url: str = "https://api.openai.com/v1"
+    embedding_base_url: str = ""
 
     # Chunk
     chunk_size: int = 512

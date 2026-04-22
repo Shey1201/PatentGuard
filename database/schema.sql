@@ -47,11 +47,11 @@ CREATE TABLE system_config (
 
 -- 默认配置初始数据
 INSERT INTO system_config (config_key, config_value, description) VALUES
-    ('llm_provider', 'openai', 'LLM 服务提供商'),
-    ('llm_model', 'gpt-4o-mini', 'LLM 模型名称'),
+    ('llm_provider', 'custom', 'LLM 服务类型'),
+    ('llm_model', '', 'LLM 模型名称'),
     ('llm_api_key', '', 'LLM API Key'),
-    ('llm_base_url', 'https://api.openai.com/v1', 'LLM API 基础地址'),
-    ('embedding_model', 'text-embedding-3-small', 'Embedding 模型'),
+    ('llm_base_url', '', 'LLM API 基础地址'),
+    ('embedding_model', '', 'Embedding 模型'),
     ('embedding_dim', '1536', 'Embedding 维度'),
     ('chunk_size', '512', '文档分块大小'),
     ('chunk_overlap', '50', '分块重叠大小'),
@@ -103,7 +103,7 @@ CREATE TABLE document_chunks (
     document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
     chunk_index INTEGER NOT NULL,
     chunk_text TEXT NOT NULL,
-    embedding VECTOR(1536), -- 1536 维向量 (text-embedding-3-small)
+    embedding VECTOR(1536), -- 默认 1536 维向量，可按实际 Embedding 服务调整
     start_position INTEGER,
     end_position INTEGER,
     metadata JSONB,

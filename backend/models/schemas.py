@@ -206,15 +206,15 @@ class MessageResponse(BaseModel):
 # User API Config schemas (每个用户独立的 API 配置)
 class UserAPIConfigBase(BaseModel):
     # LLM 配置
-    llm_provider: str = "openai"
+    llm_provider: str = "custom"
     llm_api_key: Optional[str] = None
-    llm_base_url: str = "https://api.openai.com/v1"
-    llm_model: str = "gpt-4o-mini"
+    llm_base_url: str = ""
+    llm_model: str = ""
 
     # Embedding 配置
-    embedding_model: str = "text-embedding-3-small"
+    embedding_model: str = ""
     embedding_api_key: Optional[str] = None
-    embedding_base_url: str = "https://api.openai.com/v1"
+    embedding_base_url: str = ""
     embedding_dim: int = 1536
 
 

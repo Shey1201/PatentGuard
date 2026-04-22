@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Card, Table, Tag, Button, Select, DatePicker, Space, Row, Col,
-  Statistic, Modal, Drawer, Descriptions, Spin, Empty, Tooltip, Popconfirm,
-  Input, Segmented, Badge
+  Card, Table, Tag, Button, Select, Space, Row, Col,
+  Drawer, Descriptions, Spin, Empty, Tooltip, Popconfirm,
+  Input
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
   CheckCircleOutlined, ClockCircleOutlined, SyncOutlined,
   ExclamationCircleOutlined, DeleteOutlined, EyeOutlined,
-  ReloadOutlined, SearchOutlined, FilterOutlined, FileTextOutlined,
-  WarningOutlined, TrophyOutlined, RiseOutlined
+  ReloadOutlined, SearchOutlined, FileTextOutlined,
+  WarningOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -17,13 +17,9 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
 import { analysisApi } from '../services/api';
 import { ReviewTask, ReviewResult } from '../types';
-import { useAuthStore } from '../stores/auth';
 
 dayjs.extend(relativeTime);
 dayjs.locale('zh-cn');
-
-const { RangePicker } = DatePicker;
-const { TextArea } = Input;
 
 type StatusFilter = 'all' | 'completed' | 'pending' | 'processing' | 'failed';
 
@@ -199,7 +195,6 @@ const HistoryPage: React.FC = () => {
   const [selectedTask, setSelectedTask] = useState<ReviewTask | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
-  const user = useAuthStore(s => s.user);
 
   // 统计
   const stats = {
@@ -248,7 +243,7 @@ const HistoryPage: React.FC = () => {
   };
 
   // 重新审查
-  const handleReReview = (task: ReviewTask) => {
+  const handleReReview = () => {
     navigate('/review');
   };
 
@@ -320,7 +315,7 @@ const HistoryPage: React.FC = () => {
           </Tooltip>
           <Tooltip title="重新审查">
             <Button size="small" type="text" icon={<ReloadOutlined />} className="text-gray-500 hover:text-sky-600"
-                    onClick={() => handleReReview(record)} />
+                    onClick={handleReReview} />
           </Tooltip>
           <Popconfirm title="确定删除？" onConfirm={() => handleDelete(record.id)} okText="删除" cancelText="取消">
             <Tooltip title="删除">

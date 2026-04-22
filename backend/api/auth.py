@@ -16,7 +16,7 @@ from backend.services.auth import (
     get_current_user, get_optional_user, get_user_from_token,
     decode_token, sign_up, sign_in, authenticate_user
 )
-from backend.config_local import get_settings
+from backend.config import get_settings
 
 router = APIRouter(prefix="/auth", tags=["认证"])
 security = HTTPBearer()

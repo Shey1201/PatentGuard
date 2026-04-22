@@ -59,8 +59,8 @@ async def get_embedding_config(db: AsyncSession, user_id: uuid.UUID) -> dict:
     configs = {c.config_key: c.config_value for c in config_result.scalars().all()}
     return {
         "api_key": configs.get("embedding_api_key", "") or configs.get("llm_api_key", ""),
-        "base_url": configs.get("embedding_base_url", "") or configs.get("llm_base_url", "https://api.openai.com/v1"),
-        "model": configs.get("embedding_model", "text-embedding-3-small"),
+        "base_url": configs.get("embedding_base_url", "") or configs.get("llm_base_url", ""),
+        "model": configs.get("embedding_model", ""),
         "dimension": int(configs.get("embedding_dim", 1536))
     }
 

@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import time
 import loguru
 
-from backend.config_local import get_settings
+from backend.config import get_settings
 from backend.models.database import init_db, get_db, AsyncSessionLocal
 from backend.api import auth, kb, analysis, system, user_config
 from backend.api.tracking import router as tracking_router

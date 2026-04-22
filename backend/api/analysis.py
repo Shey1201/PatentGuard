@@ -54,10 +54,10 @@ async def get_llm_config(db: AsyncSession, user_id: uuid.UUID = None) -> dict:
     result = await db.execute(select(SystemConfig))
     configs = {c.config_key: c.config_value for c in result.scalars().all()}
     return {
-        "provider": configs.get("llm_provider", "openai"),
+        "provider": configs.get("llm_provider", "custom"),
         "api_key": configs.get("llm_api_key", ""),
-        "base_url": configs.get("llm_base_url", "https://api.openai.com/v1"),
-        "model": configs.get("llm_model", "gpt-4o-mini")
+        "base_url": configs.get("llm_base_url", ""),
+        "model": configs.get("llm_model", "")
     }
 
 
@@ -82,8 +82,8 @@ async def get_retrieval_config(db: AsyncSession, user_id: uuid.UUID = None) -> d
     configs = {c.config_key: c.config_value for c in result.scalars().all()}
     return {
         "api_key": configs.get("embedding_api_key", "") or configs.get("llm_api_key", ""),
-        "base_url": configs.get("embedding_base_url", "") or configs.get("llm_base_url", "https://api.openai.com/v1"),
-        "model": configs.get("embedding_model", "text-embedding-3-small"),
+        "base_url": configs.get("embedding_base_url", "") or configs.get("llm_base_url", ""),
+        "model": configs.get("embedding_model", ""),
         "top_k": int(configs.get("retrieval_top_k", 5))
     }
 

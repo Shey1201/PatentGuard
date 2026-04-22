@@ -8,7 +8,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from backend.config_local import get_settings
+from backend.config import get_settings
 from backend.models.database import User
 
 settings = get_settings()
@@ -71,7 +71,7 @@ def decode_token(token: str) -> dict:
 
 async def get_user_for_token(token: str, db: AsyncSession) -> User:
     """根据 token 解析出当前用户；支持演示 token 返回默认管理员"""
-    if token == DEMO_TOKEN:
+    if settings.enable_demo_mode and token == DEMO_TOKEN:
         result = await db.execute(select(User).where(User.email == "admin@patentguard.com"))
         user = result.scalar_one_or_none()
         if not user or not user.is_active:
@@ -159,7 +159,7 @@ async def get_user_from_token(token: str) -> Optional[User]:
     """根据 token 获取用户（用于中间件）"""
     from backend.models.database import AsyncSessionLocal
 
-    if token == DEMO_TOKEN:
+    if settings.enable_demo_mode and token == DEMO_TOKEN:
         async with AsyncSessionLocal() as db:
             result = await db.execute(select(User).where(User.email == "admin@patentguard.com"))
             return result.scalar_one_or_none()

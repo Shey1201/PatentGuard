@@ -117,7 +117,6 @@ class Tracker {
   private maxQueueSize: number = 20;
   private timer: ReturnType<typeof setTimeout> | null = null;
   private isSending: boolean = false;
-  private userId: string | null = null;
 
   constructor() {
     this.sessionId = this.getOrCreateSessionId();
@@ -141,7 +140,6 @@ class Tracker {
   }
 
   private getSystemInfo(): SystemInfo {
-    const ua = navigator.userAgent;
     let browser = 'Unknown';
     let os = 'Unknown';
     let device = 'Desktop';
@@ -187,7 +185,11 @@ class Tracker {
   }
 
   setUserId(userId: string | null): void {
-    this.userId = userId;
+    if (userId) {
+      sessionStorage.setItem('pg_user_id', userId);
+    } else {
+      sessionStorage.removeItem('pg_user_id');
+    }
   }
 
   track(event: TrackEvent): void {
@@ -195,6 +197,10 @@ class Tracker {
       ...event,
       session_id: event.session_id || this.sessionId,
       system_info: event.system_info || this.getSystemInfo(),
+      properties: {
+        ...(event.properties || {}),
+        user_id: sessionStorage.getItem('pg_user_id') || undefined,
+      },
     };
 
     this.queue.push(enrichedEvent);

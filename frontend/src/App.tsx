@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, Avatar, Dropdown, Button } from 'antd';
+import { Layout, Menu, Avatar, Dropdown, Button, Spin } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   DashboardOutlined,
@@ -11,20 +11,25 @@ import {
   LogoutOutlined,
   UserOutlined,
   SafetyCertificateOutlined,
-  SwapOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from './stores/auth';
 import { useAppModeStore } from './stores/appMode';
 import { useTrackerStore } from './stores/tracker';
 import { tracker } from './utils/tracker';
-import LoginPage from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import KnowledgeBasePage from './pages/KnowledgeBase';
-import AnalysisPage from './pages/Analysis';
-import SettingsPage from './pages/Settings';
-import HistoryPage from './pages/History';
-
 const { Header, Sider, Content } = Layout;
+
+const LoginPage = lazy(() => import('./pages/Login'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const KnowledgeBasePage = lazy(() => import('./pages/KnowledgeBase'));
+const AnalysisPage = lazy(() => import('./pages/Analysis'));
+const SettingsPage = lazy(() => import('./pages/Settings'));
+const HistoryPage = lazy(() => import('./pages/History'));
+
+const PageFallback = () => (
+  <div className="flex items-center justify-center h-64">
+    <Spin size="large" />
+  </div>
+);
 
 const AppLayoutShell: React.FC = () => {
   const logout = useAuthStore((state) => state.logout);
@@ -237,7 +242,9 @@ const AppLayoutShell: React.FC = () => {
           </div>
         </Header>
         <Content className="p-5 md:p-6 bg-[#f4f6f9] flex-1 overflow-auto flex flex-col min-h-0">
-          {renderContent()}
+          <Suspense fallback={<PageFallback />}>
+            {renderContent()}
+          </Suspense>
         </Content>
       </Layout>
     </Layout>
@@ -283,7 +290,7 @@ const App: React.FC = () => {
     return (
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<Suspense fallback={<PageFallback />}><LoginPage /></Suspense>} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>

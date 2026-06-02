@@ -17,7 +17,3 @@ PatentGuard 的文档按读者和使用场景分层。
 
 - [部署说明](ops/deployment.md)
 - [常见问题](ops/faq.md)
-
-## 展示材料
-
-- [面试材料](presentation/interview-notes.md)
